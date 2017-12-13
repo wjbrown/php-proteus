@@ -1,0 +1,22 @@
+{
+    "name": "wjbrown/proteus",
+    "description": "Image Manipulation and Caching",
+    "keywords": ["image", "imagick"],
+    "homepage": "https://github.com/wjbrown/php-proteus",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Josh Brown",
+            "email": "wjbrown@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^5.3 || ^7.0",
+        "ext-imagick": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "wjbrown\\Proteus\\": "src"
+        }
+    }
+}

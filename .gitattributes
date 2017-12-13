@@ -1,0 +1,7 @@
+##
+# When installing a --prefer-dist version with composer these dirs and files won't be installed.
+##
+
+/demo               export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore

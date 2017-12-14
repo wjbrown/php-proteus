@@ -13,33 +13,33 @@ class ImageCache
 
     const DS = '/';
 
-    private static $path = self::DS . 'tmp';
+    private $path = self::DS . 'tmp';
 
-    private static function setPath($path)
+    private function setPath($path)
     {
         if (is_dir($path) && is_writable($path)) {
-            self::$path = realpath($path);
+            $this->path = realpath($path);
         }
         else {
             throw new ImageCacheException ("Directory $path does not exist or is not writable.");
         }
     }
 
-    public static function config($settings)
+    public function config($settings)
     {
         if (isset($settings['path'])) {
-            self::setPath($settings['path']);
+            $this->setPath($settings['path']);
         }
     }
 
-    public static function write($key, $data)
+    public function write($key, $data)
     {
-        file_put_contents(self::$path . self::DS . $key, $data);
+        file_put_contents($this->path . self::DS . $key, $data);
     }
 
-    public static function read($key)
+    public function read($key)
     {
-        if ($data = file_get_contents(self::$path . self::DS . $key)) {
+        if ($data = file_get_contents($this->path . self::DS . $key)) {
             return $data;
         }
         else {
@@ -47,29 +47,29 @@ class ImageCache
         }
     }
 
-    public static function remember ($key, $callback)
+    public function remember ($key, $callback)
     {
         $key = sha1(json_encode($key));
-        if (!($image = self::read($key))) {
+        if (!($image = $this->read($key))) {
             $image = $callback();
-            self::write($key, $image);
+            $this->write($key, $image);
         }
         return $image;
     }
 
-    public static function delete($key)
+    public function delete($key)
     {
-        unlink(self::$path . self.DS . self.$key);
+        unlink($this->path . self::DS . self.$key);
     }
 
-    public static function clear()
+    public function clear()
     {
-        foreach (glob(self::$path . self.DS . '*') as $file) {
+        foreach (glob($this->path . self::DS . '*') as $file) {
             unlink($file);
         }
     }
 
-    public static function gc()
+    public function gc()
     {
         // Why do this with php when a crontab will suffice?
 

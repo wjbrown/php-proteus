@@ -1,8 +1,8 @@
 <?php
-require('Image.php');
-require('ImageCache.php');
+require __DIR__ . '/../src/Image.php';
+require __DIR__ . '/../src/ImageCache.php';
 
-\Proteus\ImageCache::config([
+$imgcache = new \Proteus\ImageCache([
     'path' => dirname(__FILE__) . '/img/cache'
 ]);
 
@@ -15,7 +15,7 @@ $request->query    = [
 ];
 
 // remember, the $img here is something that could come from the callback OR a file.  its basically a string.
-$img = \Proteus\ImageCache::remember($request, function() use ($request) {
+$img = $imgcache->remember($request, function() use ($request) {
 
     $img = new \Proteus\Image('img/' . $request->filename);
     $img->resize($request->query['w'], $request->query['h']);

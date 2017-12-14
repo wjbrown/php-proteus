@@ -8,6 +8,8 @@ A set of classes that can be used to manipulate images and cache the results.  I
 handles operations that I've found to be the most useful.  Several image manipulation functions were omitted b/c they seem
 to be handled well with css.
 
+I've got another repo that acts as a CDN, using these classes within a slim framework deployment.  https://github.com/wjbrown/php-proteus-slim
+
 ## What it does
 
 Here's a short list of things it can do:

@@ -6,21 +6,6 @@ namespace Proteus;
  * Image Manipulation Class
  *
  * @author Wjbrown <wjbrown@gmail.com>
- *
- * @method Image ($filepath)
- * @method Image open($filepath)
- * @method Image saveAs($file, $quality)
- * @method Image getImageType()
- * @method Image setImageType()
- * @method Image getExt()
- * @method Image getWidth()
- * @method Image getHeight()
- * 
- * @method Image resize($type = 'fit', $width = null, $height = null)
- * @method Image crop($x, $y, $width, $height)
- * @method Image sharpen()
- * 
- * @method Image __toString()
  */
 class Image
 {

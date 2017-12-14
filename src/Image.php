@@ -58,7 +58,7 @@ class Image
         return $this->imagick->getImageHeight();
     }
 
-    public function resize ($type = 'fit', $width = 0, $height = 0, $gravity = imagick::GRAVITY_SOUTHEAST)
+    public function resize ($type = 'fit', $width = 0, $height = 0, $gravity = 'c')
     {
         if ($width == 0 && $height == 0) {
             return;
@@ -70,11 +70,12 @@ class Image
            $height = ($width / $this->getWidth()) * $this->getHeight();
         }
 
+        $this->gravity($gravity);
+
         switch ($type) {
             case 'fit'     : $this->imagick->scaleImage($width, $height, true);          break;
             case 'force'   : $this->imagick->scaleImage($width, $height, false);         break;
             case 'adaptive': 
-                $this->gravity($gravity);
                 $this->imagick->adaptiveResizeImage($width, $height, true);
                 break;
             // case 'thumbnail':
@@ -88,15 +89,15 @@ class Image
         $gravity = strtr(
             $gravity,
             [
-                's'  => imagick::GRAVITY_SOUTH,
-                'se' => imagick::GRAVITY_SOUTHEAST,
-                'e'  => imagick::GRAVITY_EAST,
-                'ne' => imagick::GRAVITY_NORTHEAST,
-                'n'  => imagick::GRAVITY_NORTH,
-                'nw' => imagick::GRAVITY_NORTHWEST,
-                'w'  => imagick::GRAVITY_WEST,
-                'sw' => imagick::GRAVITY_SOUTHWEST,
-                'c'  => imagick::GRAVITY_CENTER,
+                's'  => \Imagick::GRAVITY_SOUTH,
+                'se' => \Imagick::GRAVITY_SOUTHEAST,
+                'e'  => \Imagick::GRAVITY_EAST,
+                'ne' => \Imagick::GRAVITY_NORTHEAST,
+                'n'  => \Imagick::GRAVITY_NORTH,
+                'nw' => \Imagick::GRAVITY_NORTHWEST,
+                'w'  => \Imagick::GRAVITY_WEST,
+                'sw' => \Imagick::GRAVITY_SOUTHWEST,
+                'c'  => \Imagick::GRAVITY_CENTER,
             ]
         );
         $this->imagick->setImageGravity($gravity);

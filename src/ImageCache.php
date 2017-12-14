@@ -39,12 +39,13 @@ class ImageCache
 
     public function read($key)
     {
-        if ($data = file_get_contents($this->path . self::DS . $key)) {
-            return $data;
+        $fullpath = $this->path . self::DS . $key;
+        if (file_exists($fullpath)) {
+            if ($data = file_get_contents($fullpath)) {
+                return $data;
+            }
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     public function remember ($key, $callback)

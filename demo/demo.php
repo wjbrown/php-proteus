@@ -10,8 +10,9 @@ $request           = new StdClass();
 $request->filename = 'saturn.png';
 $request->query    = [
     'resize' => 'thumbnail',
-    'w'      => '600',
-    'h'      => '600'
+    'w'      => '400',
+    'h'      => '400',
+    'g'      => 'ne'
 ];
 
 // remember, the $img here is something that could come from the callback OR a file.  its basically a string.

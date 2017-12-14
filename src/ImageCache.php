@@ -15,6 +15,13 @@ class ImageCache
 
     private $path = self::DS . 'tmp';
 
+    public function __construct($settings)
+    {
+        if (isset($settings['path'])) {
+            $this->setPath($settings['path']);
+        }
+    }
+
     private function setPath($path)
     {
         if (is_dir($path) && is_writable($path)) {
@@ -22,13 +29,6 @@ class ImageCache
         }
         else {
             throw new ImageCacheException ("Directory $path does not exist or is not writable.");
-        }
-    }
-
-    public function config($settings)
-    {
-        if (isset($settings['path'])) {
-            $this->setPath($settings['path']);
         }
     }
 
@@ -49,7 +49,6 @@ class ImageCache
 
     public function remember ($key, $callback)
     {
-        $key = sha1(json_encode($key));
         if (!($image = $this->read($key))) {
             $image = $callback();
             $this->write($key, $image);

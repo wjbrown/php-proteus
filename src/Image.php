@@ -58,7 +58,7 @@ class Image
         return $this->imagick->getImageHeight();
     }
 
-    public function resize ($type = 'fit', $width = 0, $height = 0)
+    public function resize ($type = 'fit', $width = 0, $height = 0, $gravity = imagick::GRAVITY_SOUTHEAST)
     {
         if ($width == 0 && $height == 0) {
             return;
@@ -73,11 +73,33 @@ class Image
         switch ($type) {
             case 'fit'     : $this->imagick->scaleImage($width, $height, true);          break;
             case 'force'   : $this->imagick->scaleImage($width, $height, false);         break;
-            case 'adaptive': $this->imagick->adaptiveResizeImage($width, $height, true); break;
+            case 'adaptive': 
+                $this->gravity($gravity);
+                $this->imagick->adaptiveResizeImage($width, $height, true);
+                break;
             // case 'thumbnail':
             // case 'crop':
             default        : $this->imagick->cropThumbnailImage($width, $height);
         }
+    }
+
+    public function gravity($gravity = 'center') 
+    {
+        $gravity = strtr(
+            $gravity,
+            [
+                's'  => imagick::GRAVITY_SOUTH,
+                'se' => imagick::GRAVITY_SOUTHEAST,
+                'e'  => imagick::GRAVITY_EAST,
+                'ne' => imagick::GRAVITY_NORTHEAST,
+                'n'  => imagick::GRAVITY_NORTH,
+                'nw' => imagick::GRAVITY_NORTHWEST,
+                'w'  => imagick::GRAVITY_WEST,
+                'sw' => imagick::GRAVITY_SOUTHWEST,
+                'c'  => imagick::GRAVITY_CENTER,
+            ]
+        );
+        $this->imagick->setImageGravity($gravity);
     }
 
     public function crop($width, $height, $x, $y)

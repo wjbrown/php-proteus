@@ -6,13 +6,16 @@ $imgcache = new \Proteus\ImageCache([
     'path'         => dirname(__FILE__) . '/img/cache',
 ]);
 
+$imgcache->off();
+
 $request           = new StdClass();
-$request->filename = 'saturn.png';
+$request->filename = 'picnic.jpg';
 $request->query    = [
-    'resize' => 'thumbnail',
-    'w'      => '400',
-    'h'      => '400',
-    'g'      => 'ne'
+    'type'   => 'zoomCrop',
+    'w'      => '200',
+    'h'      => '300',
+    'g'      => 'se',
+    's'      => 0
 ];
 
 // remember, the $img here is something that could come from the callback OR a file.  its basically a string.
@@ -20,7 +23,14 @@ $cachekey = sha1(json_encode($request));
 $img = $imgcache->remember($cachekey, function() use ($request) {
 
     $img = new \Proteus\Image('img/' . $request->filename);
-    $img->resize($request->query['w'], $request->query['h']);
+    $img->resize(
+        $request->query['type'],
+        $request->query['w'],
+        $request->query['h'],
+        [
+            'gravity' => $request->query['g']
+        ]
+    );
     return $img;    // return the blob that is going to be cached
 
 });

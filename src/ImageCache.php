@@ -15,6 +15,8 @@ class ImageCache
 
     private $path = self::DS . 'tmp';
 
+    private $on = true;
+
     public function __construct($settings)
     {
         if (isset($settings['path'])) {
@@ -32,17 +34,31 @@ class ImageCache
         }
     }
 
+    public function on()
+    {
+        $this->on = true;
+    }
+    
+    public function off()
+    {
+        $this->on = false;
+    }
+
     public function write($key, $data)
     {
-        file_put_contents($this->path . self::DS . $key, $data);
+        if ($this->on) {
+            file_put_contents($this->path . self::DS . $key, $data);
+        }
     }
 
     public function read($key)
     {
-        $fullpath = $this->path . self::DS . $key;
-        if (file_exists($fullpath)) {
-            if ($data = file_get_contents($fullpath)) {
-                return $data;
+        if ($this->on) {
+            $fullpath = $this->path . self::DS . $key;
+            if (file_exists($fullpath)) {
+                if ($data = file_get_contents($fullpath)) {
+                    return $data;
+                }
             }
         }
         return null;

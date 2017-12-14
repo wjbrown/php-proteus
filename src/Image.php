@@ -58,7 +58,7 @@ class Image
         return $this->imagick->getImageHeight();
     }
 
-    public function resize ($type = 'fit', $width = 0, $height = 0, $gravity = 'c')
+    public function resize ($type = 'fit', $width = 0, $height = 0, $params = [])
     {
         if ($width == 0 && $height == 0) {
             return;
@@ -70,42 +70,84 @@ class Image
            $height = ($width / $this->getWidth()) * $this->getHeight();
         }
 
-        $this->gravity($gravity);
+        $defaults = [
+            'gravity' => 'c'
+        ];
+
+        $options = array_merge($defaults, $params);
 
         switch ($type) {
             case 'fit'     : $this->imagick->scaleImage($width, $height, true);          break;
             case 'force'   : $this->imagick->scaleImage($width, $height, false);         break;
-            case 'adaptive': 
-                $this->imagick->adaptiveResizeImage($width, $height, true);
-                break;
-            // case 'thumbnail':
-            // case 'crop':
-            default        : $this->imagick->cropThumbnailImage($width, $height);
+            case 'adaptive': $this->imagick->adaptiveResizeImage($width, $height, true); break;
+            case 'zoomCrop':
+                if ($options['gravity'] == 'c') {
+                    $this->imagick->cropThumbnailImage($width, $height);
+                }
+                // imagick's cropThumbnailImage ignores gravity for some reason
+                else {
+                    // if we are asking for an image that's a wider aspect-ratio than what we have
+                    if (($width / $height) > ($this->getWidth() / $this->getHeight())) {
+                        // resize based on width
+                        $this->imagick->scaleImage($width, $this->getHeight(), true);
+                        $this->cropByGravity($width, $height, $options['gravity']);
+                    }
+                    // else
+                    else {
+                        // resize based on width
+                        $this->imagick->scaleImage($this->getWidth(), $height, true);
+                        $this->cropByGravity($width, $height, $options['gravity']);
+                    }
+                }
         }
-    }
-
-    public function gravity($gravity = 'center') 
-    {
-        $gravity = strtr(
-            $gravity,
-            [
-                's'  => \Imagick::GRAVITY_SOUTH,
-                'se' => \Imagick::GRAVITY_SOUTHEAST,
-                'e'  => \Imagick::GRAVITY_EAST,
-                'ne' => \Imagick::GRAVITY_NORTHEAST,
-                'n'  => \Imagick::GRAVITY_NORTH,
-                'nw' => \Imagick::GRAVITY_NORTHWEST,
-                'w'  => \Imagick::GRAVITY_WEST,
-                'sw' => \Imagick::GRAVITY_SOUTHWEST,
-                'c'  => \Imagick::GRAVITY_CENTER,
-            ]
-        );
-        $this->imagick->setImageGravity($gravity);
     }
 
     public function crop($width, $height, $x, $y)
     {
         $this->imagick->cropImage($width, $height, $x, $y);
+    }
+
+    public function cropByGravity($width, $height, $gravity)
+    {
+        switch ($gravity) {
+            case 'n':
+                $x = ($this->getWidth() / 2) - ($width / 2);
+                $y = 0;
+                break;
+            case 'ne':
+                $x = $this->getWidth() - $width;
+                $y = 0;
+                break;
+            case 'e':
+                $x = $this->getWidth() - $width;
+                $y = ($this->getHeight() / 2) - ($height / 2);
+                break;
+            case 'se':
+                $x = $this->getWidth() - $width;
+                $y = $this->getHeight() - $height;
+                break;
+            case 's':
+                $x = ($this->getWidth() / 2) - ($width / 2);
+                $y = $this->getHeight() - $height;
+                break;
+            case 'sw':
+                $x = 0;
+                $y = $this->getHeight() - $height;
+                break;
+            case 'w':
+                $x = 0;
+                $y = ($this->getHeight() / 2) - ($height / 2);
+                break;
+            case 'nw':
+                $x = 0;
+                $y = 0;
+                break;
+            default:    // 'center'
+                $x = ($this->getWidth() / 2) - ($width / 2);
+                $y = ($this->getHeight() / 2) - ($height / 2);
+        }
+
+        return $this->crop($width, $height, $x, $y);
     }
 
     public function sharpen ($type = 'default', $radius = 0, $sigma = 1)

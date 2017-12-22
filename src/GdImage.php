@@ -146,6 +146,7 @@ class GdImage extends Image
 
     public function __toString()
     {
+        ob_start();
         switch ($this->getImageType()) {
             case 'png':
                 imagepng($this->resource);
@@ -157,6 +158,9 @@ class GdImage extends Image
                 imagegif($this->resource);
                 break;
         }
+        $data = ob_get_contents();
+        ob_end_clean();
+        return $data;
     }
 
 }

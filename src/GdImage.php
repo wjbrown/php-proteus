@@ -103,13 +103,13 @@ class GdImage extends Image
                 // if we are asking for an image that's a wider aspect-ratio than what we have
                 if (($width / $height) > ($this->getWidth() / $this->getHeight())) {
                     // resize based on width
-                    $this->resource = imagescale($width, $height * ($width/$this->getWidth()));
+                    $this->resource = imagescale($this->resource, $width, $height * ($width/$this->getWidth()));
                     $this->cropByGravity($width, $height, $options['gravity']);
                 }
                 // else
                 else {
                     // resize based on width
-                    $this->resource = imagescale($width * ($height/$this->getHeight()), $height);
+                    $this->resource = imagescale($this->resource, $width * ($height/$this->getHeight()), $height);
                     $this->cropByGravity($width, $height, $options['gravity']);
                 }
         }

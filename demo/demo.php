@@ -1,5 +1,7 @@
 <?php
 require __DIR__ . '/../src/Image.php';
+require __DIR__ . '/../src/ImagickImage.php';
+require __DIR__ . '/../src/GdImage.php';
 require __DIR__ . '/../src/ImageCache.php';
 
 $imgcache = new \Proteus\ImageCache([
@@ -9,9 +11,9 @@ $imgcache = new \Proteus\ImageCache([
 $imgcache->off();
 
 $request           = new StdClass();
-$request->filename = 'picnic.jpg';
+$request->filename = 'saturn.png';
 $request->query    = [
-    'type'   => 'zoomCrop',
+    'type'   => 'crop',
     'w'      => '200',
     'h'      => '300',
     'g'      => 'se',
@@ -22,7 +24,7 @@ $request->query    = [
 $cachekey = sha1(json_encode($request));
 $img = $imgcache->remember($cachekey, function() use ($request) {
 
-    $img = new \Proteus\Image('img/' . $request->filename);
+    $img = \Proteus\Image::create('img/' . $request->filename);
     $img->resize(
         $request->query['type'],
         $request->query['w'],
@@ -35,7 +37,7 @@ $img = $imgcache->remember($cachekey, function() use ($request) {
 
 });
 
-header('Content-type: ' . \Proteus\Image::getContentType($img));
+header('Content-type: ' . \Proteus\Image::getContentType((string)$img));
 header('Cache-Control: max-age=324555');
 echo $img;
 

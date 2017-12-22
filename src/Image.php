@@ -7,104 +7,44 @@ namespace Proteus;
  *
  * @author Wjbrown <wjbrown@gmail.com>
  */
-class Image
+abstract class Image
 {
 
-    private $file_path, $file_name, $file_ext;
+    private $img;
 
-    private $imagick;
+    public static function create($file_path)
+    {
+        return extension_loaded('imagick') ? new ImagickImage($file_path) : new GdImage($file_path);
+    }
 
-    public function __construct($file_path)
+    protected function __construct($file_path)
     {
         $this->open($file_path);
     }
 
-    public function open($file_path)
-    {
-        $this->file_path = $file_path;
-        $this->file_name = basename($file_path);
-        $this->file_ext = substr(strrchr($file_path, "."), 1);
+    abstract public function open($file_path);
 
-        $this->imagick = new \Imagick($file_path);
-    }
+    abstract public function saveAs($file_path);
 
-    public function saveAs($file_path)
-    {
-        return $this->imagick->writeImageFile($file_path);
-    }
+    abstract public function getImageType();
 
-    public function getImageType()
-    {
-        return $this->imagick->getImageFormat();
-    }
+    abstract public function setImageType($type);
 
-    public function setImageType($type)
-    {
-        $this->setImageFormat($type);
-    }
+    abstract public function getWidth();
+
+    abstract public function getHeight();
+
+    abstract public function resize ($type = 'fit', $width = 0, $height = 0, $params = []);
+
+    abstract public function crop($width, $height, $x, $y);
+
+    abstract public function sharpen ($type = 'default', $radius = 0, $sigma = 1);
+
+    abstract public function __toString();
 
     public function getExt()
     {
         return strtolower($this->getImageType());
-    }
-
-    public function getWidth()
-    {
-        return $this->imagick->getImageWidth();
-    }
-
-    public function getHeight()
-    {
-        return $this->imagick->getImageHeight();
-    }
-
-    public function resize ($type = 'fit', $width = 0, $height = 0, $params = [])
-    {
-        if ($width == 0 && $height == 0) {
-            return;
-        }
-        else if ($width == 0) {
-           $width = ($height / $this->getHeight()) * $this->getWidth();
-        }
-        else if ($height == 0) {
-           $height = ($width / $this->getWidth()) * $this->getHeight();
-        }
-
-        $defaults = [
-            'gravity' => 'c'
-        ];
-
-        $options = array_merge($defaults, $params);
-
-        switch ($type) {
-            case 'fit'     : $this->imagick->scaleImage($width, $height, true);          break;
-            case 'force'   : $this->imagick->scaleImage($width, $height, false);         break;
-            case 'adaptive': $this->imagick->adaptiveResizeImage($width, $height, true); break;
-            case 'zoomCrop':
-                if ($options['gravity'] == 'c') {
-                    $this->imagick->cropThumbnailImage($width, $height);
-                }
-                // imagick's cropThumbnailImage ignores gravity for some reason
-                else {
-                    // if we are asking for an image that's a wider aspect-ratio than what we have
-                    if (($width / $height) > ($this->getWidth() / $this->getHeight())) {
-                        // resize based on width
-                        $this->imagick->scaleImage($width, $this->getHeight(), true);
-                        $this->cropByGravity($width, $height, $options['gravity']);
-                    }
-                    // else
-                    else {
-                        // resize based on width
-                        $this->imagick->scaleImage($this->getWidth(), $height, true);
-                        $this->cropByGravity($width, $height, $options['gravity']);
-                    }
-                }
-        }
-    }
-
-    public function crop($width, $height, $x, $y)
-    {
-        $this->imagick->cropImage($width, $height, $x, $y);
     }
 
     public function cropByGravity($width, $height, $gravity)
@@ -148,21 +88,6 @@ class Image
         }
 
         return $this->crop($width, $height, $x, $y);
-    }
-
-    public function sharpen ($type = 'default', $radius = 0, $sigma = 1)
-    {
-        if ($type == 'default') {
-            $this->imagick->sharpenImage($radius, $sigma);
-        }
-        else {
-            $this->imagick->adaptiveSharpenImage($radius, $sigma);
-        }
-    }
-
-    public function __toString()
-    {
-        return $this->imagick->__toString();
     }
 
     public static function getContentType($blob)

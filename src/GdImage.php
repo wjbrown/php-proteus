@@ -89,30 +89,46 @@ class GdImage extends Image
             case 'fit'     :
                 // height is the limiting factor
                 if (($width/$height) > ($this->getWidth()/$this->getHeight())) {
-                    $this->resource = imagescale($this->resource, $width * ($height/$this->getHeight()), $height);
+                    $this->scale($this->getWidth() * ($height/$this->getHeight()), $height);
                 }
                 // width is the limiting factor
                 else {
-                    $this->resource = imagescale($this->resource, $width, $height * ($width/$this->getWidth()));
+                    $this->scale($width, $this->getHeight() * ($width/$this->getWidth()));
                 }
                 break;
             case 'force'   : 
-                $this->resource = imagescale($this->resource, $width, $height);
+                $this->scale($width, $height);
                 break;
             case 'crop'    :
                 // if we are asking for an image that's a wider aspect-ratio than what we have
                 if (($width / $height) > ($this->getWidth() / $this->getHeight())) {
                     // resize based on width
-                    $this->resource = imagescale($this->resource, $width, $height * ($width/$this->getWidth()));
+                    $this->scale($width, $this->getHeight() * ($width/$this->getWidth()));
                     $this->cropByGravity($width, $height, $options['gravity']);
                 }
                 // else
                 else {
                     // resize based on width
-                    $this->resource = imagescale($this->resource, $width * ($height/$this->getHeight()), $height);
+                    $this->scale($this->getWidth() * ($height/$this->getHeight()), $height);
                     $this->cropByGravity($width, $height, $options['gravity']);
                 }
         }
+    }
+
+    private function scale($newWidth, $newHeight) 
+    {
+        $resized = imagecreatetruecolor($newWidth, $newHeight);
+        $this->resource = imagecopyresampled(
+            $resized, 
+            $this->resource, 
+            0, 0, 0, 0, 
+            $newWidth, 
+            $newHeight, 
+            $this->getWidth(),
+            $this->getHeight()
+        );
+        imagedestroy($this->resource);
+        $this->resource = $resized;
     }
 
     public function crop($width, $height, $x, $y)

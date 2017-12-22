@@ -7,7 +7,7 @@ namespace Proteus;
  *
  * @author Wjbrown <wjbrown@gmail.com>
  */
-class GdImage
+class GdImage extends Image
 {
 
     private $resource;

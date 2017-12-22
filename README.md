@@ -16,8 +16,8 @@ Here's a short list of things it can do:
 - resize
 - - force
 - - fit
-- - adaptive
-- - zoom-crop
+- - adaptive (if imagick)
+- - crop
 - crop
 - sharpen (I've found sharpen necessary after reducing the size of jpegs)
 

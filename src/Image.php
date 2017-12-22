@@ -12,9 +12,18 @@ abstract class Image
 
     private $img;
 
+    public static $gd = false;
+
     public static function create($file_path)
     {
-        return extension_loaded('imagick') ? new ImagickImage($file_path) : new GdImage($file_path);
+        if (self::$gd) {
+            $img = new GdImage($file_path);
+        }
+        else {
+            $img = extension_loaded('imagick') ? new ImagickImage($file_path) : new GdImage($file_path);
+        }
+        
+        return $img;
     }
 
     protected function __construct($file_path)
